@@ -42,7 +42,7 @@ func Tail(filename string, out io.Writer) {
 				return
 			}
 			newSize := newInfo.Size()
-			if newSize != oldSize {
+			if newSize == oldSize {
 				continue
 			}
 			if newSize < oldSize {
