@@ -23,7 +23,7 @@ mkdir "$HOME/go/src"
 cd "$HOME/go/src"
 git clone https://github.com/abergasov/ssh_notify.git
 cd ssh_notify
-go build
+go build main.go
 ```
 
 ### Set config
@@ -52,7 +52,7 @@ Description=notify on every ssh_login
 Type=simple
 Restart=always
 RestartSec=5s
-ExecStart=PATH_TO_HOMEDIR/go/src/ssh_notify/ssh_notify
+ExecStart=PATH_TO_HOMEDIR/go/src/ssh_notify/main
 
 [Install]
 WantedBy=multi-user.target
@@ -68,3 +68,10 @@ sudo systemctl enable ssh_notify
 ```bash
 sudo journalctl -f -u ssh_notify.service
 ```
+
+### Sample
+notify on key login
+![Repo_List](log_by_key.png)
+
+notify on password login
+![Repo_List](log_by_pass.png)
