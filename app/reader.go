@@ -2,9 +2,9 @@ package app
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -23,12 +23,8 @@ func Tail(filename string, out io.Writer) {
 	}
 	oldSize := info.Size()
 	for {
-		for line, prefix, err := r.ReadLine(); err != io.EOF; line, prefix, err = r.ReadLine() {
-			if prefix {
-				fmt.Fprint(out, string(line))
-			} else {
-				fmt.Fprintln(out, string(line))
-			}
+		for line, _, err := r.ReadLine(); err != io.EOF; line, _, err = r.ReadLine() {
+			searchMatch(string(line))
 		}
 		pos, err := f.Seek(0, io.SeekCurrent)
 		if err != nil {
@@ -55,4 +51,12 @@ func Tail(filename string, out io.Writer) {
 			break
 		}
 	}
+}
+
+func searchMatch(row string) {
+	matched, _ := regexp.MatchString(`sshd\[[0-9]{1,}\]:.Accepted`, row)
+	if !matched {
+		return
+	}
+	go LogMessage("New server login", []string{conf.ServerName, row})
 }
