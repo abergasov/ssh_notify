@@ -19,6 +19,7 @@ func main() {
 		println("make sure that the application starts as root")
 		return
 	}
+	println("Log file ok, start watch", conf.SSHLogFile)
 	app.Tail(conf.SSHLogFile, os.Stdout)
 }
 

@@ -24,6 +24,10 @@ func New() *Config {
 		TelegramNotifyChat: getVariableOrDefault(parseredConf, "TelegramNotifyChat", ""),
 		ServerName:         getVariableOrDefault(parseredConf, "ServerName", "default_server_name"),
 	}
+	println("Config loaded")
+	println("Log file", conf.SSHLogFile)
+	println("Server name", conf.ServerName)
+	println("Telegram chat", conf.TelegramNotifyChat)
 	return conf
 }
 

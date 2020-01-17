@@ -63,5 +63,6 @@ func searchMatch(row string) {
 	if !matched {
 		return
 	}
+	println("Found matches in auth log", row)
 	go LogMessage("New server login", []string{conf.ServerName, row})
 }
