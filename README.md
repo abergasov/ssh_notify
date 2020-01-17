@@ -63,3 +63,8 @@ Start service
 sudo service ssh_notify start
 sudo systemctl enable ssh_notify
 ```
+
+### Logs
+```bash
+sudo journalctl -f -u ssh_notify.service
+```

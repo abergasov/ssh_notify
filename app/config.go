@@ -3,6 +3,7 @@ package app
 import (
 	"bufio"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -24,17 +25,17 @@ func New() *Config {
 		TelegramNotifyChat: getVariableOrDefault(parseredConf, "TelegramNotifyChat", ""),
 		ServerName:         getVariableOrDefault(parseredConf, "ServerName", "default_server_name"),
 	}
-	println("Config loaded")
-	println("Log file", conf.SSHLogFile)
-	println("Server name", conf.ServerName)
-	println("Telegram chat", conf.TelegramNotifyChat)
+	log.Print("Config loaded")
+	log.Print("Log file", conf.SSHLogFile)
+	log.Print("Server name", conf.ServerName)
+	log.Print("Telegram chat", conf.TelegramNotifyChat)
 	return conf
 }
 
 func readConf() *map[string]string {
 	file, err := os.Open("/etc/ssh_notify.conf")
 	if err != nil {
-		println("Can't open app config file /etc/ssh_notify.conf")
+		log.Print("Can't open app config file /etc/ssh_notify.conf")
 		panic(err.Error())
 	}
 	defer file.Close()

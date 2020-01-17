@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"ssh_notify/app"
 )
@@ -9,17 +10,17 @@ var conf = app.New()
 
 func main() {
 	if !fileExist(conf.SSHLogFile) {
-		println("ssh log file not found")
-		println("check file exists at", conf.SSHLogFile)
-		println("also you can set another file through the config")
+		log.Print("ssh log file not found")
+		log.Print("check file exists at", conf.SSHLogFile)
+		log.Print("also you can set another file through the config")
 		return
 	}
 	if !fileHasReadPermissions(conf.SSHLogFile) {
-		println("app has't read permissions to file", conf.SSHLogFile)
-		println("make sure that the application starts as root")
+		log.Print("app has't read permissions to file", conf.SSHLogFile)
+		log.Print("make sure that the application starts as root")
 		return
 	}
-	println("Log file ok, start watch", conf.SSHLogFile)
+	log.Print("Log file ok, start watch", conf.SSHLogFile)
 	app.Tail(conf.SSHLogFile, os.Stdout)
 }
 
@@ -38,8 +39,8 @@ func fileHasReadPermissions(fileName string) bool {
 		if os.IsPermission(err) {
 			return false
 		}
-		println("error while open log file")
-		println(err.Error())
+		log.Print("error while open log file")
+		log.Print(err.Error())
 		return false
 	}
 	return true
