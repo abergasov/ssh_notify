@@ -70,8 +70,11 @@ sudo journalctl -f -u ssh_notify.service
 ```
 
 ### Sample
-notify on key login
+> notify on key login
+
 ![Repo_List](log_by_key.png)
 
-notify on password login
+
+> notify on password login
+
 ![Repo_List](log_by_pass.png)
