@@ -22,8 +22,12 @@ func Tail(filename string, out io.Writer) {
 		return
 	}
 	oldSize := info.Size()
+	skipRows := true
 	for {
 		for line, _, err := r.ReadLine(); err != io.EOF; line, _, err = r.ReadLine() {
+			if skipRows {
+				continue
+			}
 			searchMatch(string(line))
 		}
 		pos, err := f.Seek(0, io.SeekCurrent)
@@ -31,6 +35,7 @@ func Tail(filename string, out io.Writer) {
 			panic(err)
 		}
 		for {
+			skipRows = false
 			time.Sleep(time.Second)
 			newInfo, err := f.Stat()
 			if err != nil {
