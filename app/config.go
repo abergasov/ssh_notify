@@ -44,6 +44,10 @@ func readConf() *map[string]string {
 	for {
 		line, err := reader.ReadString('\n')
 
+		if err == io.EOF {
+			break
+		}
+
 		equal := strings.Index(line, "=")
 		if equal == -1 {
 			continue
@@ -54,9 +58,7 @@ func readConf() *map[string]string {
 			}
 			tmpConf[key] = strings.TrimSpace(line[equal+1:])
 		}
-		if err == io.EOF {
-			break
-		}
+
 		if err != nil {
 			panic(err.Error())
 		}
