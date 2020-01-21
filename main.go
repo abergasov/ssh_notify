@@ -21,7 +21,7 @@ func main() {
 		return
 	}
 	log.Print("Log file ok, start watch", conf.SSHLogFile)
-	app.Tail(conf.SSHLogFile, os.Stdout)
+	app.Tail(conf.SSHLogFile)
 }
 
 func fileExist(fileName string) bool {
