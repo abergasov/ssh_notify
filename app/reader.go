@@ -2,11 +2,12 @@ package app
 
 import (
 	"bufio"
-	"crypto/sha256"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"regexp"
+	"syscall"
 	"time"
 )
 
@@ -52,7 +53,8 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 			}
 			newSize := newInfo.Size()
 			if newSize == oldSize {
-				if checkFileMoved(fileName, hashFile(f)) {
+				if checkFileMoved(fileName, info) {
+					println("files are not equal, reopen file")
 					return
 				}
 				continue
@@ -69,22 +71,23 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 	}
 }
 
-func checkFileMoved(fileName string, currentHash string) bool {
-	f, err := os.Open(fileName)
+func checkFileMoved(fileName string, info os.FileInfo) bool {
+	//println("checking file changed")
+	ff, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-
-	return hashFile(f) != currentHash
+	defer ff.Close()
+	infoNew, _ := ff.Stat()
+	return getFileIno(info) != getFileIno(infoNew)
 }
 
-func hashFile(f *os.File) string {
-	h := sha256.New()
-	if _, err := io.Copy(h, f); err != nil {
-		log.Fatal(err)
+func getFileIno(info os.FileInfo) uint64 {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		fmt.Printf("Not a syscall.Stat_t")
 	}
-	return string(h.Sum(nil))
+	return stat.Ino
 }
 
 func searchMatch(row string) {
