@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -22,5 +23,20 @@ func TelegramMessage(chatId string, message string, parseMode string) {
 		"parse_mode": parseMode,
 	})
 	url := "https://api.telegram.org/bot" + conf.TelegramBotToken + "/sendMessage"
-	_, _ = http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil || (resp != nil && resp.StatusCode != 200) {
+		println("========= BEGIN TELEGRAM MESSAGE ERROR =========")
+		if resp != nil {
+			println("Resp status ", resp.Status)
+			bodyBytes, e := ioutil.ReadAll(resp.Body)
+			if e == nil {
+				bodyString := string(bodyBytes)
+				println(bodyString)
+			}
+		}
+		if err != nil {
+			println(err.Error())
+		}
+		println("========= END TELEGRAM MESSAGE ERROR =========")
+	}
 }
