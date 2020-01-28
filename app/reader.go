@@ -93,10 +93,10 @@ func getFileIno(info os.FileInfo) uint64 {
 }
 
 func searchMatch(row string) {
-	matched, _ := regexp.MatchString(`sshd\[[0-9]{1,}\]:.Accepted`, row)
+	matched, _ := regexp.MatchString(`sshd[[0-9]+]:.Accepted`, row)
 	if !matched {
 		return
 	}
 	log.Print("Found matches in auth log", row)
-	go LogMessage("New server login", []string{conf.ServerName, row})
+	LogMessage("New server login", []string{conf.ServerName, row})
 }

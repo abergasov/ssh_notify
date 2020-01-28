@@ -13,6 +13,8 @@ type Config struct {
 	ServerName         string
 	TelegramBotToken   string
 	TelegramNotifyChat string
+	SlackToken         string
+	SlackChannel       string
 }
 
 var conf *Config
@@ -24,6 +26,8 @@ func New() *Config {
 		TelegramBotToken:   getVariableOrDefault(parseredConf, "TelegramBotToken", ""),
 		TelegramNotifyChat: getVariableOrDefault(parseredConf, "TelegramNotifyChat", ""),
 		ServerName:         getVariableOrDefault(parseredConf, "ServerName", "default_server_name"),
+		SlackToken:         getVariableOrDefault(parseredConf, "SlackBotToken", ""),
+		SlackChannel:       getVariableOrDefault(parseredConf, "SlackTargetChannel", ""),
 	}
 	log.Print("Config loaded")
 	log.Print("Log file", conf.SSHLogFile)

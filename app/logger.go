@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -13,19 +14,40 @@ func LogMessage(message string, additionalData []string) {
 	for i := range additionalData {
 		values = append(values, additionalData[i])
 	}
-	TelegramMessage(conf.TelegramNotifyChat, strings.Join(values, "\n"), "html")
+	messagePrepared := strings.Join(values, "\n")
+	if conf.TelegramBotToken != "" && conf.TelegramNotifyChat != "" {
+		go TelegramMessage(messagePrepared, "html")
+	}
+	if conf.SlackToken != "" && conf.SlackChannel != "" {
+		go SlackMessage(messagePrepared)
+	}
 }
 
-func TelegramMessage(chatId string, message string, parseMode string) {
+func SlackMessage(message string) {
+	data := url.Values{}
+	data.Set("token", conf.SlackToken)
+	data.Set("channel", conf.SlackChannel)
+	data.Set("text", message)
+
+	apiUrl := "https://slack.com/api/chat.postMessage"
+	resp, err := http.Post(apiUrl, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
+	logError("SLACK", resp, err)
+}
+
+func TelegramMessage(message string, parseMode string) {
 	requestBody, _ := json.Marshal(map[string]string{
-		"chat_id":    chatId,
+		"chat_id":    conf.TelegramNotifyChat,
 		"text":       message,
 		"parse_mode": parseMode,
 	})
-	url := "https://api.telegram.org/bot" + conf.TelegramBotToken + "/sendMessage"
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	apiUrl := "https://api.telegram.org/bot" + conf.TelegramBotToken + "/sendMessage"
+	resp, err := http.Post(apiUrl, "application/json", bytes.NewBuffer(requestBody))
+	logError("TELEGRAM", resp, err)
+}
+
+func logError(method string, resp *http.Response, err error) {
 	if err != nil || (resp != nil && resp.StatusCode != 200) {
-		println("========= BEGIN TELEGRAM MESSAGE ERROR =========")
+		println("========= BEGIN " + method + " MESSAGE ERROR =========")
 		if resp != nil {
 			println("Resp status ", resp.Status)
 			bodyBytes, e := ioutil.ReadAll(resp.Body)
@@ -37,6 +59,6 @@ func TelegramMessage(chatId string, message string, parseMode string) {
 		if err != nil {
 			println(err.Error())
 		}
-		println("========= END TELEGRAM MESSAGE ERROR =========")
+		println("========= END " + method + " MESSAGE ERROR =========")
 	}
 }
