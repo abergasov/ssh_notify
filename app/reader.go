@@ -79,9 +79,9 @@ func checkFileMoved(fileName string, info os.FileInfo) bool {
 	}
 	defer ff.Close()
 	infoNew, _ := ff.Stat()
-	inoOld := getFileIno(info)
-	inoNew := getFileIno(infoNew)
-	return inoOld != inoNew
+	//inoOld := getFileIno(info)
+	//inoNew := getFileIno(infoNew)
+	return !os.SameFile(info, infoNew)
 }
 
 func getFileIno(info os.FileInfo) uint64 {
