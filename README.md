@@ -12,6 +12,9 @@ Notify about new ssh login on your server into telegram/slack
 
 ![Repo_List](log_by_pass.png)
 
+> notify if list of known ips specified (known/unknown ip login)
+![Repo_List](ip_spec.png)
+
 ## Build
 You'll need go v1.13 or later
 
