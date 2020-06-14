@@ -15,6 +15,7 @@ type Config struct {
 	TelegramNotifyChat string
 	SlackToken         string
 	SlackChannel       string
+	KnownIps           map[string]string
 }
 
 var conf *Config
@@ -28,6 +29,19 @@ func New() *Config {
 		ServerName:         getVariableOrDefault(parseredConf, "ServerName", "default_server_name"),
 		SlackToken:         getVariableOrDefault(parseredConf, "SlackBotToken", ""),
 		SlackChannel:       getVariableOrDefault(parseredConf, "SlackTargetChannel", ""),
+		KnownIps:           make(map[string]string),
+	}
+
+	ips := getVariableOrDefault(parseredConf, "KnownIps", "")
+	if len(ips) != 0 {
+		servers := strings.Split(ips, ";")
+		for _, str := range servers {
+			srv := strings.Split(strings.TrimSpace(str), ":")
+			if len(srv) != 2 {
+				continue
+			}
+			conf.KnownIps[strings.TrimSpace(srv[0])] = strings.TrimSpace(srv[1])
+		}
 	}
 	log.Print("Config loaded")
 	log.Print("Log file", conf.SSHLogFile)

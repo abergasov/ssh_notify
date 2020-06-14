@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func LogMessage(message string, additionalData []string) {
+func LogMessage(message string, additionalData ...string) {
 	values := []string{message}
 	for i := range additionalData {
 		values = append(values, additionalData[i])

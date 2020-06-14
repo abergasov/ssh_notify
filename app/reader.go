@@ -2,14 +2,15 @@ package app
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"regexp"
-	"syscall"
+	"strings"
 	"time"
 )
+
+var ipReg = regexp.MustCompile(`([0-9]{1,3}[\.]){3}[0-9]{1,3}`)
 
 func Tail(filename string) {
 	skipRows := true
@@ -21,14 +22,14 @@ func Tail(filename string) {
 func tailUntilRotate(fileName string, skipRows *bool) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		LogMessage(err.Error(), []string{"impossible open log file", fileName})
+		LogMessage(err.Error(), "impossible open log file", fileName)
 		return
 	}
 	defer f.Close()
 	r := bufio.NewReader(f)
 	info, err := f.Stat()
 	if err != nil {
-		LogMessage(err.Error(), []string{"impossible get init file info", fileName})
+		LogMessage(err.Error(), "impossible get init file info", fileName)
 		return
 	}
 	oldSize := info.Size()
@@ -48,7 +49,7 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 			time.Sleep(time.Second)
 			newInfo, err := f.Stat()
 			if err != nil {
-				LogMessage(err.Error(), []string{"impossible get file info", fileName})
+				LogMessage(err.Error(), "impossible get file info", fileName)
 				return
 			}
 			newSize := newInfo.Size()
@@ -84,19 +85,23 @@ func checkFileMoved(fileName string, info os.FileInfo) bool {
 	return !os.SameFile(info, infoNew)
 }
 
-func getFileIno(info os.FileInfo) uint64 {
-	stat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok {
-		fmt.Printf("Not a syscall.Stat_t")
-	}
-	return stat.Ino
-}
-
 func searchMatch(row string) {
 	matched, _ := regexp.MatchString(`sshd[[0-9]+]:.Accepted`, row)
 	if !matched {
 		return
 	}
 	log.Print("Found matches in auth log", row)
-	LogMessage("New server login", []string{conf.ServerName, row})
+	var titleMsg string
+	if len(conf.KnownIps) > 0 {
+		titleMsg = "UNKNOWN IP login on server"
+		if ipReg.MatchString(row) {
+			connectedIp := strings.TrimSpace((ipReg.FindAllString(row, -1))[0])
+			if knownServerName, ok := conf.KnownIps[connectedIp]; ok {
+				titleMsg = knownServerName + " login on server"
+			}
+		}
+	} else {
+		titleMsg = "New server login"
+	}
+	LogMessage(titleMsg, conf.ServerName, row)
 }

@@ -48,6 +48,9 @@ TelegramNotifyChat = YOUR_CHAT_HERE
 # slack settings (optional, just do not set if not need)
 SlackBotToken = YOUR_BOT_TOKEN_HERE
 SlackTargetChannel = YOUR_CHANNEL_HERE
+
+# list of known ips separated by comma (deploy bot, personal vpn, etc...)
+KnownIps = 35.243.248.170:Gitlab ; 35.190.190.84 :Gitlab ; 35.229.20.217:Gitlab;127.0.0.1:PersonalVPN
 ```
 
 ### Create service and run
