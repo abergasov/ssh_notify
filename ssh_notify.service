@@ -1,0 +1,11 @@
+[Unit]
+Description=notify on every ssh_login
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+ExecStart=/usr/bin/ssh_notify
+
+[Install]
+WantedBy=multi-user.target

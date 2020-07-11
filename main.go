@@ -8,7 +8,15 @@ import (
 
 var conf = app.New()
 
+var (
+	buildTime string = "_dev"
+	buildHash string = "_dev"
+)
+
 func main() {
+	log.Println("App build time:", buildTime)
+	log.Println("App build hash:", buildHash)
+
 	if !fileExist(conf.SSHLogFile) {
 		log.Print("ssh log file not found")
 		log.Print("check file exists at", conf.SSHLogFile)
