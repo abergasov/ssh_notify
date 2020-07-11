@@ -25,9 +25,30 @@ sudo apt-get update
 sudo apt-get install golang-go
 ```
 
-### Clone repository and build
+### Install via make
 ```shell script
-mkdir "$HOME/go/src"
+mkdir -p "$HOME/go/src"
+cd "$HOME/go/src"
+git clone https://github.com/abergasov/ssh_notify.git
+```
+Create with telegram notify only
+```shell script
+ make name=dev_server tg_token=12312312312 tg_chat=-123 install
+```
+
+Create with full config
+```shell script
+ make name=dev_server tg_token=123122 tg_chat=-123 sl_token=123 sl_chn=123 ips=127.0.0.1:PersonalVPN install
+```
+
+Remove
+```shell script
+make remove
+```
+
+### Manually install
+```shell script
+mkdir -p "$HOME/go/src"
 cd "$HOME/go/src"
 git clone https://github.com/abergasov/ssh_notify.git
 cd ssh_notify
