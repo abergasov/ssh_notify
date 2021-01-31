@@ -3,14 +3,14 @@ package main
 import (
 	"log"
 	"os"
-	"ssh_notify/app"
+	"ssh_notify/internal"
 )
 
-var conf = app.New()
+var conf = internal.New()
 
 var (
-	buildTime string = "_dev"
-	buildHash string = "_dev"
+	buildTime = "_dev"
+	buildHash = "_dev"
 )
 
 func main() {
@@ -24,12 +24,12 @@ func main() {
 		return
 	}
 	if !fileHasReadPermissions(conf.SSHLogFile) {
-		log.Print("app has't read permissions to file", conf.SSHLogFile)
+		log.Print("internal has't read permissions to file", conf.SSHLogFile)
 		log.Print("make sure that the application starts as root")
 		return
 	}
 	log.Print("Log file ok, start watch", conf.SSHLogFile)
-	app.Tail(conf.SSHLogFile)
+	internal.Tail(conf.SSHLogFile)
 }
 
 func fileExist(fileName string) bool {
@@ -42,7 +42,6 @@ func fileExist(fileName string) bool {
 
 func fileHasReadPermissions(fileName string) bool {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0666)
-	defer file.Close()
 	if err != nil {
 		if os.IsPermission(err) {
 			return false
@@ -51,5 +50,6 @@ func fileHasReadPermissions(fileName string) bool {
 		log.Print(err.Error())
 		return false
 	}
+	defer file.Close()
 	return true
 }

@@ -10,7 +10,7 @@ KNOWN_IPS := $(or ${ips},${ips},"")
 
 install:
 	@echo "-- building binary"
-	go build -ldflags "-X main.buildHash=${COMMIT} -X main.buildTime=${BUILD_TIME}" -o ./bin
+	go build -ldflags "-X main.buildHash=${COMMIT} -X main.buildTime=${BUILD_TIME}" -o ./bin/ssh_notify ./cmd
 	@echo "-- copy binary"
 	#sudo cp ./bin/ssh_notify /usr/bin/
 

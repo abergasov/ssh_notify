@@ -1,4 +1,4 @@
-package app
+package internal
 
 import (
 	"bufio"
@@ -53,7 +53,7 @@ func New() *Config {
 func readConf() *map[string]string {
 	file, err := os.Open("/etc/ssh_notify.conf")
 	if err != nil {
-		log.Print("Can't open app config file /etc/ssh_notify.conf")
+		log.Print("Can't open internal config file /etc/ssh_notify.conf")
 		panic(err.Error())
 	}
 	defer file.Close()
