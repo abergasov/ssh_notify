@@ -12,7 +12,7 @@ install:
 	@echo "-- building binary"
 	go build -ldflags "-X main.buildHash=${COMMIT} -X main.buildTime=${BUILD_TIME}" -o ./bin/ssh_notify ./cmd
 	@echo "-- copy binary"
-	#sudo cp ./bin/ssh_notify /usr/bin/
+	sudo cp ./bin/ssh_notify /usr/bin/
 
 	@echo "-- create sample config"
 	cp ssh_notify.conf ssh_notify.conf.tmp
