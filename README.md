@@ -24,6 +24,8 @@ You'll need go v1.13 or later
 sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 sudo apt-get install golang-go
+# or via snap
+snap install go --classic
 ```
 
 ### Install via make
