@@ -28,6 +28,53 @@ sudo apt-get install golang-go
 snap install go --classic
 ```
 
+### Ansible script
+script for create for `admin` user
+roles/ssh_notify/tasks/main.yml
+```yaml
+---
+- name: Install go
+  community.general.snap:
+    name: go
+    classic: yes
+    channel: 1.18/stable
+
+- name: Clone a github repository
+  become: yes
+ # become_user: admin
+  become_method: sudo
+  git:
+    repo: https://github.com/abergasov/ssh_notify
+    dest: /home/admin/go/src/ssh_notify
+    clone: yes
+    update: yes
+
+- name: Run install target
+  timeout: 30
+  no_log: True
+  become: yes
+  become_method: sudo
+  ansible.builtin.command: make name={{ server_name }} tg_token={{ tg_token }} tg_chat={{ tg_chat }} install
+  args:
+    chdir: /home/admin/go/src/ssh_notify
+```
+
+playbook.yaml
+```yaml
+# VPN
+---
+- hosts: "vpns"
+  user: root
+  vars_files:
+    - secret
+    - vars/main.yml
+  become: true
+  roles:
+    ...
+    - ssh_notify
+    ...
+```
+
 ### Install via make
 ```shell script
 mkdir -p "$HOME/go/src"
