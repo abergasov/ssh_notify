@@ -1,4 +1,4 @@
-COMMIT?=$(shell git ls-files | xargs sha256sum | cut -d" " -f1 | sha256sum | cut -d" " -f1)
+COMMIT?=$(shell git rev-parse HEAD)
 BUILD_TIME?=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
 
 SERVER_NAME := $(or ${name},${name},"")
@@ -8,12 +8,18 @@ SLACK_TOKEN := $(or ${sl_token},${sl_token},"")
 SLACK_CHANEL := $(or ${sl_chn},${sl_chn},"")
 KNOWN_IPS := $(or ${ips},${ips},"")
 
-install:
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+build: ## Builds binary
 	@echo "-- building binary"
 	go build -ldflags "-X main.buildHash=${COMMIT} -X main.buildTime=${BUILD_TIME}" -o ./bin/ssh_notify ./cmd
+
+set_binary: build ## Copy binary to /usr/bin
 	@echo "-- copy binary"
 	sudo cp ./bin/ssh_notify /usr/bin/
 
+install: set_binary ## Install service
 	@echo "-- create sample config"
 	cp ssh_notify.conf ssh_notify.conf.tmp
 
@@ -42,3 +48,6 @@ remove:
 	sudo systemctl disable ssh_notify
 	sudo rm /etc/systemd/system/ssh_notify.service
 	sudo rm /etc/ssh_notify.conf
+
+.PHONY: remove install set_binary build help
+.DEFAULT_GOAL := help
