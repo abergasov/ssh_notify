@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-var ipReg = regexp.MustCompile(`([0-9]{1,3}[\.]){3}[0-9]{1,3}`)
+var (
+	ipReg     = regexp.MustCompile(`([0-9]{1,3}[\.]){3}[0-9]{1,3}`)
+	acceptReg = regexp.MustCompile(`sshd[[0-9]+]:.Accepted`)
+)
 
 func Tail(filename string) {
 	skipRows := true
@@ -86,8 +89,7 @@ func checkFileMoved(fileName string, info os.FileInfo) bool {
 }
 
 func searchMatch(row string) {
-	matched, _ := regexp.MatchString(`sshd[[0-9]+]:.Accepted`, row)
-	if !matched {
+	if matched := acceptReg.MatchString(row); !matched {
 		return
 	}
 	log.Print("Found matches in auth log", row)
