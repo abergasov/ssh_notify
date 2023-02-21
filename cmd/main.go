@@ -28,7 +28,7 @@ func main() {
 		log.Print("make sure that the application starts as root")
 		return
 	}
-	internal.LogMessage("SSH notify service started", conf.ServerName)
+	internal.LogMessage("ssh notify service started", "server: "+conf.ServerName)
 	log.Print("Log file ok, start watch", conf.SSHLogFile)
 	internal.Tail(conf.SSHLogFile)
 }
