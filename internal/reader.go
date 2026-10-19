@@ -19,6 +19,7 @@ func Tail(filename string) {
 	skipRows := true
 	for {
 		tailUntilRotate(filename, &skipRows)
+		time.Sleep(time.Second)
 	}
 }
 
@@ -26,6 +27,7 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		LogMessage(err.Error(), "impossible open log file", fileName)
+		*skipRows = false
 		return
 	}
 	defer f.Close()
@@ -37,7 +39,15 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 	}
 	oldSize := info.Size()
 	for {
-		for line, _, err := r.ReadLine(); err != io.EOF; line, _, err = r.ReadLine() {
+		for {
+			line, _, err := r.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				LogMessage(err.Error(), "impossible read log file", fileName)
+				return
+			}
 			if *skipRows {
 				continue
 			}
@@ -45,7 +55,8 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 		}
 		pos, err := f.Seek(0, io.SeekCurrent)
 		if err != nil {
-			panic(err)
+			LogMessage(err.Error(), "impossible get log position", fileName)
+			return
 		}
 		for {
 			*skipRows = false
@@ -64,9 +75,13 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 				continue
 			}
 			if newSize < oldSize {
-				f.Seek(0, 0)
-			} else {
-				f.Seek(pos, io.SeekStart)
+				if _, err := f.Seek(0, io.SeekStart); err != nil {
+					LogMessage(err.Error(), "impossible seek log file", fileName)
+					return
+				}
+			} else if _, err := f.Seek(pos, io.SeekStart); err != nil {
+				LogMessage(err.Error(), "impossible seek log file", fileName)
+				return
 			}
 			r = bufio.NewReader(f)
 			oldSize = newSize
@@ -77,12 +92,10 @@ func tailUntilRotate(fileName string, skipRows *bool) {
 
 func checkFileMoved(fileName string, info os.FileInfo) bool {
 	//println("checking file changed")
-	ff, err := os.Open(fileName)
+	infoNew, err := os.Stat(fileName)
 	if err != nil {
-		log.Fatal(err)
+		return true
 	}
-	defer ff.Close()
-	infoNew, _ := ff.Stat()
 	//inoOld := getFileIno(info)
 	//inoNew := getFileIno(infoNew)
 	return !os.SameFile(info, infoNew)
